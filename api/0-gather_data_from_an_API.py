@@ -1,24 +1,21 @@
 #!/usr/bin/python3
-"""Returns information about his/her TODO list with employee ID"""
-
+""" returns info about employee TODO list progress using REST API """
 import requests
 import sys
 
+
 if __name__ == "__main__":
     url = "https://jsonplaceholder.typicode.com"
-    # return user
-    user = requests.get(url + "/users/{}".format(sys.argv[1])).json()
-    # return todo filter by userID
-    todos = requests.get(url + "/todos", params={"userId": sys.argv[1]}).json()
-    total_tasks = len(todos)
-    completed_task = 0
-    for todo in todos:
-        if todo["completed"]:
-            completed_task = completed_task + 1
+    employee_id = sys.argv[1]
+    user = requests.get(url + "/users/{}".format(employee_id)).json()
+    todos = requests.get(url + "/users/" + employee_id + "/todos").json()
 
+    EMPLOYEE_NAME = user.get("name")
+
+    TOTAL_NUMBER_OF_TASKS = len(todos)
+    NUMBER_OF_DONE_TASKS = sum(1 for todo in todos if todo["completed"])
+# each task that meets condition is counter as 1, then added all together
     print("Employee {} is done with tasks({}/{}):".format(
-          user.get("name"), completed_task, total_tasks))
+          EMPLOYEE_NAME, NUMBER_OF_DONE_TASKS, TOTAL_NUMBER_OF_TASKS))
 
-    for todo in todos:
-        if todo["completed"]:
-            print("\t {}".format(todo["title"]))
+    [print(f"\t {todo['title']}") for todo in todos if todo["completed"]]
